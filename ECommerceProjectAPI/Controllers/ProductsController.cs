@@ -1,5 +1,6 @@
 ﻿using ECommerceProjectAPI.Data;
 using ECommerceProjectAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,12 +16,14 @@ namespace ECommerceProjectAPI.Controllers
         {
             _dbContext = context;
         }
+        [Authorize(Roles ="USER")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return await _dbContext.Products.ToListAsync();
         }
 
+        [Authorize(Roles ="Admin,ADMIN")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
@@ -31,6 +34,7 @@ namespace ECommerceProjectAPI.Controllers
             }
             return Ok(product);
         }
+        [Authorize(Roles ="Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
@@ -43,6 +47,7 @@ namespace ECommerceProjectAPI.Controllers
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
         [HttpPut("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             if(id != product.Id)
@@ -62,6 +67,7 @@ namespace ECommerceProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = _dbContext.Products.Find(id);
